@@ -1,7 +1,8 @@
 from random import randint
 import matplotlib.pyplot as plt
 import numpy as np
-
+#from matplotlib import style
+from sklearn.cluster import KMeans
 
 print "please start entering"
 n_nodes=200
@@ -84,4 +85,25 @@ for i in range(0,n_targets):
 	fig.gca().add_artist(circle)
 
 plt.plot(x_sensor,y_sensor,'bs',x_target,y_target,'g^')
-plt.show()		
+	
+
+
+kmeans=KMeans(n_clusters = n_nodes-len(set(target_mapping)) )
+kmeans.fit(nodes)
+print "Fitting done"
+centroids=kmeans.cluster_centers_
+labels = kmeans.labels_
+
+colors = ["g.","r."]
+
+for i in range (n_nodes-len(set(target_mapping))):
+	plt.plot(nodes[i][0],nodes[i][1],markersize=10)
+	
+	
+
+plt.show()
+	
+
+
+
+	
