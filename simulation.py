@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 #from matplotlib import style
 from sklearn.cluster import KMeans
-
+	
 print "please start entering"
 n_nodes=200
 n_targets=30
@@ -79,10 +79,10 @@ while targetval>0 :	#Waiting till all the targets have been covered
 				y_sensor[k]=nodes[sensor_index][1]
 		Tu[sensor_index]=W
 
-for i in range(0,n_targets):
-	circle=plt.Circle((x_sensor[i],y_sensor[i]),r_sensing,color='r')
-	fig = plt.gcf()
-	fig.gca().add_artist(circle)
+#for i in range(0,n_targets):
+#	circle=plt.Circle((x_sensor[i],y_sensor[i]),r_sensing,color='r')
+#	fig = plt.gcf()
+#	fig.gca().add_artist(circle)
 
 plt.plot(x_sensor,y_sensor,'bs',x_target,y_target,'g^')
 	
@@ -94,16 +94,62 @@ print "Fitting done"
 centroids=kmeans.cluster_centers_
 labels = kmeans.labels_
 
-colors = ["g.","r."]
+#K means algo used not according to the cost function mentioned in the paper. Maybe yes.
 
 for i in range (n_nodes-len(set(target_mapping))):
-	plt.plot(nodes[i][0],nodes[i][1],markersize=10)
+	plt.plot(nodes[i][0],nodes[i][1],markersize=1)
 	
-	
+plt.scatter(centroids[:,0],centroids[:,1],marker ="x",s=150, linewidths=1, zorder=1)	
+node_relay=[False for x in xrange(n_nodes)]
+distance = [-1 for x in xrange(n_nodes)]
+#for i in range(n_nodes-len(set(target_mapping))): #number of clusters, no of distinct labels
 
+for j in range(len(target_mapping)) : 
+	for i in range(0,n_nodes):
+		if  ( labels[target_mapping[j] ] == labels[i] ):
+			node_relay[i] = True
+			distance[i] = ( (x_node[i]-centroids[labels[i],0])**2 + ( y_node[i] - centroids[ labels[i],0 ] )**2 )**0.5
+# Two arrays having distance from the nodes and whether the node is a potential sensor or not
+
+x_relay=[]
+y_relay=[]
+
+#remaining nodes
+
+for i in range (0,n_nodes-len(set(target_mapping))):	#iterating through all the clusters
+	temp_var=0
+	for k in range(0,n_nodes):
+		 if(labels[k]==i):
+			temp_var=k
+			break
+	min_dist=distance[ temp_var ] 	#min_dist initialised as the first instance of distance of the label i
+	temp_var2=temp_var
+	for j in range(n_nodes):	#iterating through all nodes  
+		if(node_relay[j] and labels[j]==i):	#if the label of that particular node is that of the cluster and node can be a potential relay,
+			if (distance[j] < min_dist):
+				min_dist=distance[j]		
+				temp_var2=j
+				
+	if((min_dist>=0)):
+		node_relay[temp_var2]= True
+		x_relay.append(nodes[i][0])
+		y_relay.append(nodes[i][1])
+	#else:
+	#	node_relay[temp_var]=False		
+print len(x_relay)
+
+
+#for i in range (0,n_nodes):
+#	if(node_relay[i]==True):
+#		x_relay.append(nodes[i][0])
+#		y_relay.append(nodes[i][1])
+	
+#plt.plot(x_relay,y_relay,'gs')
 plt.show()
 	
-
+#Sufficient to make n_sensors number of clusters. This basically gives a set of sensors and relays with minimum distance from each other
+#Some clusters might arise which do not contain any nodes. is it safe to discard these clusters
+#cost = 
 
 
 	
