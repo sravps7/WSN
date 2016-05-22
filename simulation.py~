@@ -53,7 +53,7 @@ x_target = [x[0] for x in targets]
 y_target = [x[1] for x in targets]
 x_node = [x[0] for x in nodes]
 y_node = [x[1] for x in nodes]
-#plt.plot(x_target, y_target,'r^',x_node, y_node,'bs')
+plt.plot(x_target, y_target,'r^',x_node, y_node,'bs')
 
 
 
@@ -84,7 +84,7 @@ while targetval>0 :	#Waiting till all the targets have been covered
 #	fig.gca().add_artist(circle)
 
 plt.plot(x_sensor,y_sensor,'rs',x_target,y_target,'r^')
-plt.plot(x_sensor,y_sensor,'rs')
+#plt.plot(x_sensor,y_sensor,'rs')
 print "Red squares are sensors"
 print "Red triangles are targets"
 
@@ -98,18 +98,17 @@ labels = kmeans.labels_
 
 #K means algo used not according to the cost function mentioned in the paper. Maybe yes.
 
-for i in range (n_clusters):
-	plt.plot(nodes[i][0],nodes[i][1],markersize=1)
 	
 plt.scatter(centroids[:,0],centroids[:,1],marker ="x",s=150, linewidths=1, zorder=1)	
 node_relay=[False for x in xrange(n_nodes)]
 distance = [-1 for x in xrange(n_nodes)]
 sensor_centroid=[[0 for y in xrange(2)]for x in xrange(n_clusters)]
+
 #for i in range(n_nodes-len(set(target_mapping))): #number of clusters, no of distinct labels
 
-for m in range(0,n_clusters):
+for m in range(0,n_clusters): # for a cluster
 	counter=0
-	temp_arr=[0 for x in xrange(len(target_mapping))]#define it to be zero everytime the loop runs
+	temp_arr=[0 for x in xrange(len(target_mapping))] #define it to be zero everytime the loop runs i.e. for each and every cluster
 	
 	for n in range(len(target_mapping)):
 		if(labels[target_mapping[n]]==m):
@@ -131,15 +130,15 @@ for m in range(0,n_clusters):
 				sensor_centroid[m][0]=(sensor_centroid[m][0]+nodes[temp_arr[q]][0])/len(set(temp_arr))
 				sensor_centroid[m][1]=(sensor_centroid[m][1]+nodes[temp_arr[q]][1])/len(set(temp_arr))
 
-
+plt.plot([row[0] for row in sensor_centroid], [row[1] for row in sensor_centroid] , 'b^')
 
 for j in range(len(target_mapping)) :	#For a sensor mapping target j
 	for i in range(0,n_nodes):	# For a node i
 		if(  ( labels[target_mapping[j] ] == labels[i] ) and (target_mapping[j]!= i)) : #Checking if node i is in the same cluster as a sensor mapping target j # also making sure sensor is not the node
 			node_relay[i] = True
-			distance[i] = ( (x_node[i]-sensor_centroid[labels[i]] [0])**2 + ( y_node[i] - sensor_centroid[ labels[i]][1]  )**2 )**0.5
+			distance[i] = ( (x_node[i]-centroids[labels[i]] [0])**2 + ( y_node[i] - centroids[ labels[i]][1]  )**2 )**0.5
 # Two arrays having distance from the nodes and whether the node is a potential sensor or not
-
+node_relay1=[False for x in xrange(n_nodes)]
 x_relay=[]
 y_relay=[]
 
@@ -163,9 +162,9 @@ for i in range (0,n_clusters):	#iterating through all the clusters
 
 for i in range (n_clusters):				
 	if((min_dist[i]>=0)):
-		node_relay[temp_var[i]]= True
-		x_relay.append(nodes[i][0])
-		y_relay.append(nodes[i][1])
+		node_relay1[temp_var[i]]= True
+		x_relay.append(nodes[temp_var[i]][0])
+		y_relay.append(nodes[temp_var[i]][1])
 	#else:
 	#	node_relay[temp_var]=False		
 
