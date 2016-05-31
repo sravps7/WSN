@@ -7,10 +7,10 @@ from sklearn.cluster import KMeans
 n_nodes=500
 n_targets=20
 r_sensing=50	
-alpha=0
-Eu=1
+alpha=0.25
 E=1
-beta=0.25
+delta_E=0.1*E
+beta=0.35
 W=5
 zeroes_column=[0 for x in xrange(n_nodes)]
 
@@ -56,7 +56,7 @@ y_node = [x[1] for x in nodes]
 plt.plot(x_target, y_target,'r^')
 #plt.plot(x_node, y_node,'bs')
 
-
+Eu=[E for x in xrange(n_nodes)]
 
 #Assuming that all the targets are being covered
 while targetval>0 :	#Waiting till all the targets have been covered
@@ -64,15 +64,17 @@ while targetval>0 :	#Waiting till all the targets have been covered
 		for j in range(0,n_targets):
 			TargetSU[i]=int(TargetSU[i])+int(connections[i][j])	
 		#Assuming the sensor energy does not change
-		Tu[i]=( (1-alpha*Eu/E ) - (beta*TargetSU[i]/n_targets) )*W - Tu_initial
+		Tu[i]=( (1-alpha*Eu[i]/E ) - (beta*TargetSU[i]/n_targets) )*W - Tu_initial
 	Tu_initial=min(Tu)
 	#print (Tu)
 	while (min(Tu)==Tu_initial):	#This is for multiple occurences of the same waiting time
 		sensor_index=Tu.index(Tu_initial)	#Index of the sensor whose waiting time got over
 		for k in range (0,n_targets):
 			if( connections[sensor_index][k] ==1):
+				Eu[sensor_index]=Eu[sensor_index]-delta_E
 				for p in range (0,n_nodes):
 					connections[p][k]=zeroes_column[p]#Removing that target from connections
+				
 				targetval=targetval-1
 			 	target_mapping[k]=sensor_index #Alloting targets their sensors
 				x_sensor[k]=nodes[sensor_index][0]
