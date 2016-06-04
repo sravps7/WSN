@@ -4,7 +4,7 @@ import numpy as np
 #from matplotlib import style
 from sklearn.cluster import KMeans
 
-n_nodes =500
+n_nodes =300
 n_targets =50
 r_sensing =50	
 alpha = 0.25 
@@ -54,10 +54,10 @@ x_target = [x[0] for x in targets]
 y_target = [x[1] for x in targets]
 x_node = [x[0] for x in nodes]
 y_node = [x[1] for x in nodes]
-plt.plot(x_target, y_target,'g^',x_node, y_node,'bs')
+
 
 Eu=[E for x in xrange(n_nodes)]
-
+node_sensor=[False for x in xrange (n_nodes)]
 #Assuming that all the targets are being covered
 while targetval>0 :	#Waiting till all the targets have been covered
 	for i in range(0,n_nodes):
@@ -76,19 +76,18 @@ while targetval>0 :	#Waiting till all the targets have been covered
 					connections[p][k]=zeroes_column[p]#Removing that target from connections
 				targetval=targetval-1
 			 	target_mapping[k]=sensor_index #Alloting targets their sensors
+			 	node_sensor[sensor_index]=True
 				x_sensor[k]=nodes[sensor_index][0]
 				y_sensor[k]=nodes[sensor_index][1]
 		Tu[sensor_index]=W
 
-for i in range(0,n_targets):
-	circle=plt.Circle((x_sensor[i],y_sensor[i]),r_sensing,color='r')
-	fig = plt.gcf()
-	fig.gca().add_artist(circle)
+#for i in range(0,n_targets):
+#	circle=plt.Circle((x_sensor[i],y_sensor[i]),r_sensing,color='r')
+#	fig = plt.gcf()
+#	fig.gca().add_artist(circle)
 
-plt.plot(x_sensor,y_sensor,'rs',x_target,y_target,'g^')
-#plt.plot(x_sensor,y_sensor,'rs')
-print "Red squares are sensors"
-print "Red triangles are targets"
+#plt.plot(x_sensor,y_sensor,'rs',x_target,y_target,'g^')
+
 
 #number of clusters cannot exceed the number of sensors
 #n_clusters=n_nodes-len(set(target_mapping))
@@ -104,41 +103,30 @@ labels = kmeans.labels_
 #plt.scatter(centroids[:,0],centroids[:,1],marker ="x",s=150, linewidths=1, zorder=1)	
 node_relay=[False for x in xrange(n_nodes)]
 distance = [-1 for x in xrange(n_nodes)]
-sensor_centroid=[[0 for y in xrange(2)]for x in xrange(n_clusters)]
 
-#for i in range(n_nodes-len(set(target_mapping))): #number of clusters, no of distinct labels
+sum_x=[0 for x in xrange (n_clusters)]
+sum_y=[0 for x in xrange (n_clusters)]
+number=[0 for x in xrange(n_clusters)]
 
-for m in range(0,n_clusters): # for a cluster
-	counter=0
-	temp_arr=[0 for x in xrange(len(target_mapping))] #define it to be zero everytime the loop runs i.e. for each and every cluster
-	
-	for n in range(len(target_mapping)):
-		if(labels[target_mapping[n]]==m):
- 			temp_arr[n]=target_mapping[n]	
-#figure something out for repitition of sensors 
-	for e in range(len(temp_arr)):
-		for f in range(e,len(temp_arr)):
-			if(temp_arr[e]==temp_arr[f]):
-				temp_arr[f]=0			
-	for p in range(len(temp_arr)):
-		if(temp_arr[p]!=0):
-			counter=counter+1
-	if(counter==0):
-		sensor_centroid[m][0]=0
-		sensor_centroid[m][1]=0
-	else:
-		for q in range(len(temp_arr)):
-			if(temp_arr[q]!=0):
-				sensor_centroid[m][0]=(sensor_centroid[m][0]+nodes[temp_arr[q]][0])/len(set(temp_arr))
-				sensor_centroid[m][1]=(sensor_centroid[m][1]+nodes[temp_arr[q]][1])/len(set(temp_arr))
+for i in range(n_nodes):
+	if (node_sensor[i]):
+		sum_x[labels[i]] = sum_x[labels[i]] + nodes[i][0]
+		sum_y[labels[i]] = sum_y[labels[i]] + nodes[i][1]
+		number[labels[i]] = number[labels[i]] + 1
 
-#plt.plot([row[0] for row in sensor_centroid], [row[1] for row in sensor_centroid] , 'b^')
+for i in range(n_clusters):
+	if (number[i] > 0):
+		sum_x[i]=sum_x[i]/number[i]
+		sum_y[i]=sum_y[i]/number[i]
+
+
+#plt.plot([row[0] for row in sensor_centroid], [row[1] for row in sensor_centroid] , 'r^')
 
 for j in range(len(target_mapping)) :	#For a sensor mapping target j
 	for i in range(0,n_nodes):	# For a node i
 		if(  ( labels[target_mapping[j] ] == labels[i] ) and (target_mapping[j]!= i)) : #Checking if node i is in the same cluster as a sensor mapping target j # also making sure sensor is not the node
 			node_relay[i] = True
-			distance[i] = ( (x_node[i]-centroids[labels[i]] [0])**2 + ( y_node[i] - centroids[ labels[i]][1]  )**2 )**0.5
+			distance[i] = ( (x_node[i]-sum_x[labels[i]])**2 + ( y_node[i] - sum_y[ labels[i]])**2 )**0.5
 # Two arrays having distance from the nodes and whether the node is a potential sensor or not
 node_relay1=[False for x in xrange(n_nodes)]
 x_relay=[]
@@ -176,8 +164,14 @@ for i in range (n_clusters):
 #	if(node_relay[i]==True):
 #		x_relay.append(nodes[i][0])
 #		y_relay.append(nodes[i][1])
-	
-#plt.plot(x_relay,y_relay,'g^')
+#plt.plot(x_target, y_target,'r^')
+plt.plot(x_node, y_node,'bs')
+plt.plot(x_relay,y_relay,'g^')
+plt.plot(x_sensor,y_sensor,'rs')
+#plt.plot(sum_x, sum_y, 'g^')
+print "Blue squares are nodes"
+print "Red squares are sensors"
+print "Red triangles are targets"
 print "Green triangles are relays"
 print "Number of targets are " + str(n_targets)
 print "Number of sensors are " + str(len(set(target_mapping)))
