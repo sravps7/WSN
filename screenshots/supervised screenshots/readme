@@ -1,0 +1,3 @@
+each folder here contains two different cases , each folder has a readme file which indicates the parameters that have been changed for that example 
+cluster image means the nodes(out of the total n_nodes) that belong to one specific cluster 
+plot image just specifies the essentials (sensors relays targets)

@@ -4,9 +4,9 @@ import numpy as np
 #from matplotlib import style
 from sklearn.cluster import KMeans
 
-n_nodes=500
-n_targets=20
-r_sensing=50	
+n_nodes=100
+n_targets=5
+r_sensing=10	
 alpha=0.25
 E=1
 delta_E=0.1*E
@@ -32,12 +32,12 @@ connections=[[0 for y in xrange(n_targets)]for x in xrange(n_nodes)]
 
 
 for i in range (0,n_nodes):
-	nodes[i][0]=randint(0,500)
-	nodes[i][1]=randint(0,500)
+	nodes[i][0]=randint(0,50)
+	nodes[i][1]=randint(0,50)
 	
 for i in range (0,n_targets):
-	targets[i][0]=randint(0,500)
-	targets[i][1]=randint(0,500)
+	targets[i][0]=randint(0,50)
+	targets[i][1]=randint(0,50)
 	
 for i in range (0,n_targets):
 	error=True
@@ -86,7 +86,7 @@ print "Red squares are sensors"
 print "Red triangles are targets"
 
 n_sensors= len(set(target_mapping))
-
+print n_sensors
 n_relays=n_sensors
 node_relay=[False for x in xrange(n_nodes)]
 labels=[0 for x in xrange(n_nodes)]
@@ -99,7 +99,7 @@ while(node_relay.count(True)!=n_relays):
 	node_relay[index]=True
 	x_relay.append(nodes[index][0])
 	y_relay.append(nodes[index][1])
-	print index
+	
 
 plt.plot(x_relay,y_relay,'b^')
 
@@ -114,8 +114,7 @@ for i in range(n_nodes):	#Selecting a particular node
 
 
 x_cluster=[]
-y_cluster=[]
-				
+y_cluster=[]	
 for i in range (n_nodes):
 	if(node_relay):	
 		for j in range(n_nodes):
