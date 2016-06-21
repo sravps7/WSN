@@ -111,15 +111,22 @@ for i in range(n_clusters):
 	if (number[i] > 0):
 		sum_x[i]=sum_x[i]/number[i]
 		sum_y[i]=sum_y[i]/number[i]
-		
+	
 
-p_alpha=1
-p_beta=0
+parameters=[[0,0] for x in xrange(n_nodes)]
+f=open('input.txt','r')
+i=0
+for line in f:
+	parameters[i]=line.split()	
+	i=i+1
+
+p_alpha=0.5
+p_beta=0.5
 p_gamma=0
 p_delta=0
 ram=[0 for x in xrange(n_nodes)]
-memory=[0 for x in xrange(n_nodes)]
-distance=[0 for x in xrange(n_nodes)]
+memory=[0 for x in xrange(n_nodes)] #parameters[0]
+distance=[0 for x in xrange(n_nodes)] #parameters[1]
 power_node=[-1 for x in xrange(n_nodes)]
 #sum_x[i]  and sum_y[i] give the location of the centroid of cluster i.
 #oxygen_level, distance, Eu, ram, memory,
@@ -132,8 +139,8 @@ for j in range(len(target_mapping)) :	#For a sensor mapping target j
 			
 for i in range(n_nodes):
 	distance[i] = ( ( nodes[i][0] - sum_x [ labels[i] ] )**2 + ( nodes[i][1] - sum_y [ labels[i] ] )**2 ) **0.5  
-	power_node[i] =  p_alpha*distance[i] + p_beta*Eu[i] + p_gamma*ram[i] + p_delta*memory[i]
-
+	power_node[i] =  p_alpha*distance[i] + p_beta*Eu[i] + p_gamma*parameters[i][0] + p_delta*parameters[i][1]
+	
 
 node_relay1=[False for x in xrange(n_nodes)]
 x_relay=[]
@@ -176,19 +183,5 @@ print "Number of sensors are " + str(len(set(target_mapping)))
 print "Number of clusters are " + str(n_clusters)  
 print "Number of relays are " + str(len(x_relay))
 plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
  
