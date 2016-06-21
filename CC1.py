@@ -246,7 +246,7 @@ computation_para=[ 0 for x in xrange(req_cluster_num+1)]
 device_dn=[[0 for y in xrange(5)]for x in xrange(n_nodes)]#{P p n , τ n , U n }and the last 2 for my own parameters, the last one are for xnk and  (which indicate the processing and sensing availability  check the paper
 for i in range(n_nodes):
 	if (node_sensor[i]):
-		device_dn[i][0]=randint(0,100)/100#first parameter assignment ask about this  
+		device_dn[i][0]=randint(0,100)#first parameter assignment ask about this  
 		device_dn[i][1]=randint(0,100)#assignment of time 
 		device_dn[i][2]=randint(0,50)#this assigns a random processing power to the sensor nodes
 		
@@ -259,10 +259,10 @@ jobset_arr=[[0 for y in xrange(6)]for x in xrange(job_num)]#P s k , t ks , u k ,
 for i in range(job_num):
 	jobset_arr[i][0]=randint(0,100)
 	jobset_arr[i][1]=randint(1,5)
-	jobset_arr[i][2]=randint(25,65)
+	jobset_arr[i][2]=randint(25,50)
 	jobset_arr[i][3]=randint(1,5)
 	jobset_arr[i][4]=randint(10,20)
-	jobset_arr[i][5]=1
+	jobset_arr[i][5]=randint(0,1)
 for i in range (0,req_cluster_num):
 	for j in range(n_nodes):	
 		if (labels[j]==i and node_sensor[j]):
@@ -280,22 +280,19 @@ for k in range(job_num):
 		for j in range(n_nodes):	
 			if (labels[j]==cloud_label and node_sensor[j]):
 				time_array.append(device_dn[j][1])
-		sorted(time_array, key=int)#array sorted in ascending order 
-		print "length of time array"
-		print len(time_array)
 		for m in range(len(time_array)):
 			temp_var1=0		
 			for j in range(n_nodes):
 				if (labels[j]==cloud_label and node_sensor[j]):
 					if(device_dn[j][1]==time_array[m]):
 						temp_var1=j
-			
+			print jobset_arr[k][2]
 			if((device_dn[temp_var1][4]==0) and (100-device_dn[temp_var1][2]>=jobset_arr[k][2])):
 				device_dn[temp_var1][4]=1
-				print jobset_arr[k][2]
 				#need to create an output variable for xnk 
 				xnk[temp_var1][k]=1
 				device_dn[temp_var1][2]=device_dn[temp_var1][2]+jobset_arr[k][2]
+				print(device_dn[temp_var1][2])
 				ynk[temp_var1][k]=1
 				
 				#need to assign an output array for ynk
@@ -361,6 +358,7 @@ for i in range (n_nodes):
 
 print sum_xnk
 print sum_ynk
+
 
 
 #plt.legend(loc='upper left')
